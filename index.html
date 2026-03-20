@@ -12,215 +12,110 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js');
-    });
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
   }
 </script>
 <style>
 :root {
-  --bg: #0b0c14;
-  --surface: #13141f;
-  --border: #1e2035;
-  --c1: #ff7c5c;
-  --c2: #47d9bf;
-  --c1f: rgba(255,124,92,0.18);
-  --c2f: rgba(71,217,191,0.18);
-  --c1b: rgba(255,124,92,0.08);
-  --c2b: rgba(71,217,191,0.08);
-  --dot: #9098c0;
-  --edge-ghost: rgba(120,130,180,0.12);
-  --edge-drawn: rgba(200,210,255,0.88);
-  --text: #d8ddf5;
-  --muted: #5a6080;
+  --bg:#0b0c14; --surface:#13141f; --border:#1e2035;
+  --c1:#ff7c5c; --c2:#47d9bf;
+  --c1b:rgba(255,124,92,0.08); --c2b:rgba(71,217,191,0.08);
+  --text:#d8ddf5; --muted:#5a6080;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Syne', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 18px 12px 32px;
-  gap: 16px;
-  overflow-x: auto;
-  /* subtle grid pattern */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Syne',sans-serif; background:var(--bg); color:var(--text);
+  min-height:100vh; display:flex; flex-direction:column; align-items:center;
+  padding:18px 12px 32px; gap:16px; overflow-x:auto;
   background-image:
-    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);
+  background-size:32px 32px;
 }
+.header{text-align:center;}
+h1{
+  font-size:clamp(1.8rem,6vw,2.6rem); font-weight:800;
+  letter-spacing:6px; text-transform:uppercase;
+  background:linear-gradient(110deg,var(--c1) 0%,#e0a0ff 50%,var(--c2) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.tagline{
+  font-family:'DM Mono',monospace; font-size:1.4rem;
+  color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:2px;
+}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;}
+.ctrl-label{font-family:'DM Mono',monospace;font-size:1.44rem;color:var(--muted);letter-spacing:1px;}
+select{
+  font-family:'DM Mono',monospace; font-size:1.56rem;
+  background:var(--surface); border:1px solid var(--border); color:var(--text);
+  border-radius:8px; padding:5px 10px; cursor:pointer; outline:none;
+  transition:border-color .2s; appearance:none;
+}
+select:hover,select:focus{border-color:var(--c2);}
+.seg{
+  display:flex; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:3px; gap:3px;
+}
+.seg-btn{
+  font-family:'DM Mono',monospace; font-size:1.44rem; background:transparent;
+  border:none; color:var(--muted); border-radius:7px; padding:4px 12px;
+  cursor:pointer; transition:all .18s; letter-spacing:.5px;
+}
+.seg-btn.on{background:#e0a0ff;color:#0b0c14;font-weight:700;}
+.new-btn{
+  font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase;
+  background:linear-gradient(110deg,var(--c1),var(--c2));
+  border:none; color:#0b0c14; border-radius:10px; padding:7px 18px;
+  cursor:pointer; transition:opacity .15s,transform .1s;
+}
+.new-btn:hover{opacity:.88;} .new-btn:active{transform:scale(.96);}
+.snd-btn{
+  background:var(--surface); border:1px solid var(--border); color:var(--text);
+  border-radius:10px; padding:7px 11px; cursor:pointer; line-height:0;
+  display:flex; align-items:center; transition:border-color .18s,opacity .18s;
+}
+.snd-btn:hover{border-color:var(--c2);} .snd-btn.muted{opacity:.35;}
 
-/* ── Header ────────────────────────────────── */
-.header { text-align: center; }
-h1 {
-  font-size: clamp(1.8rem, 6vw, 2.6rem);
-  font-weight: 800;
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  background: linear-gradient(110deg, var(--c1) 0%, #e0a0ff 50%, var(--c2) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ── Scoreboard ─────────────────────── */
+.scoreboard{display:flex;align-items:center;gap:4px;overflow:visible;}
+.pcard{
+  min-width:100px; display:flex; flex-direction:column; align-items:center;
+  padding:10px 22px; border-radius:14px; background:var(--surface);
+  border:1.5px solid var(--border); transition:border-color .3s,box-shadow .3s;
 }
-.tagline {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.4rem;
-  color: var(--muted);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
+.pcard.p1{--pc:var(--c1);--pbg:var(--c1b);}
+.pcard.p2{--pc:var(--c2);--pbg:var(--c2b);}
+.pcard.alive{border-color:var(--pc);box-shadow:0 0 24px -8px var(--pc);background:var(--pbg);}
+.pname{font-family:'DM Mono',monospace;font-size:1.3rem;letter-spacing:2px;text-transform:uppercase;color:var(--pc);opacity:.8;}
+.pscore{font-size:2.4rem;font-weight:800;color:var(--pc);line-height:1;font-variant-numeric:tabular-nums;}
+.vs{font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--muted);letter-spacing:2px;padding:0 4px;}
 
-/* ── Controls ──────────────────────────────── */
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
+/* ── Character canvas wrappers ──────── */
+.char-wrap{
+  width:110px; height:120px;
+  display:flex; align-items:flex-end; justify-content:center;
+  position:relative; overflow:visible;
+  transition:transform .55s cubic-bezier(.22,1,.36,1);
 }
-.ctrl-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.44rem;
-  color: var(--muted);
-  letter-spacing: 1px;
-}
-select {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.56rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 5px 10px;
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.2s;
-  appearance: none;
-}
-select:hover, select:focus { border-color: var(--c2); }
+.char-wrap canvas{display:block; overflow:visible;}
 
-.seg {
-  display: flex;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 3px;
-  gap: 3px;
+/* ── Status ─────────────────────────── */
+#status{
+  font-family:'DM Mono',monospace; font-size:1.56rem;
+  color:var(--muted); letter-spacing:1px; min-height:1.4em;
+  text-align:center; transition:color .3s;
 }
-.seg-btn {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.44rem;
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  border-radius: 7px;
-  padding: 4px 12px;
-  cursor: pointer;
-  transition: all 0.18s;
-  letter-spacing: 0.5px;
-}
-.seg-btn.on {
-  background: var(--c2);
-  color: #0b0c14;
-  font-weight: 700;
-}
-.new-btn {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  background: linear-gradient(110deg, var(--c1), var(--c2));
-  border: none;
-  color: #0b0c14;
-  border-radius: 10px;
-  padding: 7px 18px;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
-}
-.new-btn:hover { opacity: 0.88; }
-.new-btn:active { transform: scale(0.96); }
+#status.win{font-size:2rem;font-weight:500;color:var(--text);letter-spacing:2px;}
 
-/* ── Scoreboard ────────────────────────────── */
-.scoreboard {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-.pcard {
-  min-width: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 22px;
-  border-radius: 14px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-.pcard.p1 { --pc: var(--c1); --pbg: var(--c1b); }
-.pcard.p2 { --pc: var(--c2); --pbg: var(--c2b); }
-.pcard.alive {
-  border-color: var(--pc);
-  box-shadow: 0 0 24px -8px var(--pc);
-  background: var(--pbg);
-}
-.pname {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.3rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--pc);
-  opacity: 0.8;
-}
-.pscore {
-  font-size: 2.4rem;
-  font-weight: 800;
-  color: var(--pc);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.vs {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.5rem;
-  color: var(--muted);
-  letter-spacing: 2px;
-}
-
-/* ── Status ────────────────────────────────── */
-#status {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.56rem;
-  color: var(--muted);
-  letter-spacing: 1px;
-  min-height: 1.4em;
-  text-align: center;
-  transition: color 0.3s;
-}
-#status.win {
-  font-size: 2rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: 2px;
-}
-
-/* ── Canvas ────────────────────────────────── */
-#canvas {
-  border-radius: 16px;
-  display: block;
-  cursor: crosshair;
-}
+/* ── Game canvas ────────────────────── */
+#canvas{border-radius:16px;display:block;cursor:crosshair;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>TRI-DOTS</h1>
-  <p class="tagline">Connect dots &middot; Claim triangles &middot; Outplay everyone</p>
+  <h1>TRIDOTS</h1>
 </div>
 
 <div class="controls">
@@ -233,9 +128,19 @@ select:hover, select:focus { border-color: var(--c2); }
   </select>
   <div class="seg">
     <button class="seg-btn on" id="btnPvP">2 Players</button>
-    <button class="seg-btn" id="btnPvC">vs CPU</button>
+    <button class="seg-btn"    id="btnPvC">vs CPU</button>
   </div>
-  <button class="new-btn" id="btnNew">↺ New Game</button>
+  <button class="new-btn" id="btnNew">↺ NEW</button>
+  <button class="snd-btn" id="btnSnd" title="Toggle sound">
+    <svg id="sndOn"  viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+    </svg>
+    <svg id="sndOff" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+    </svg>
+  </button>
 </div>
 
 <div class="scoreboard">
@@ -243,7 +148,8 @@ select:hover, select:focus { border-color: var(--c2); }
     <span class="pname">Player 1</span>
     <span class="pscore" id="sc0">0</span>
   </div>
-  <span class="vs">VS</span>
+  <div class="char-wrap" id="char0"></div>
+  <div class="char-wrap" id="char1"></div>
   <div class="pcard p2" id="card1">
     <span class="pname" id="p2name">Player 2</span>
     <span class="pscore" id="sc1">0</span>
@@ -252,201 +158,729 @@ select:hover, select:focus { border-color: var(--c2); }
 
 <div id="status">Player 1's turn</div>
 <canvas id="canvas"></canvas>
+<canvas id="beamCanvas" style="position:fixed;top:0;left:0;pointer-events:none;z-index:1000;"></canvas>
 
 <script>
+'use strict';
 // ═══════════════════════════════════════════════════
-//  Constants & refs
+//  Roundrect polyfill
+// ═══════════════════════════════════════════════════
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
+    this.moveTo(x+r,y); this.lineTo(x+w-r,y);
+    this.arcTo(x+w,y,x+w,y+r,r); this.lineTo(x+w,y+h-r);
+    this.arcTo(x+w,y+h,x+w-r,y+h,r); this.lineTo(x+r,y+h);
+    this.arcTo(x,y+h,x,y+h-r,r); this.lineTo(x,y+r);
+    this.arcTo(x,y,x+r,y,r); this.closePath();
+  };
+}
+
+// ═══════════════════════════════════════════════════
+//  Game canvas & constants
 // ═══════════════════════════════════════════════════
 const canvas = document.getElementById('canvas');
 const ctx    = canvas.getContext('2d');
-
-const C1  = '#ff7c5c', C2 = '#47d9bf';
-const C1F = 'rgba(255,124,92,0.20)', C2F = 'rgba(71,217,191,0.20)';
-const C1S = 'rgba(255,124,92,0.45)', C2S = 'rgba(71,217,191,0.45)';
-const COLORS  = [C1, C2];
-const CFILL   = [C1F, C2F];
-const CSTROKE = [C1S, C2S];
-const EDGE_GHOST  = 'rgba(100,110,160,0.14)';
-const EDGE_DRAWN  = 'rgba(200,210,255,0.85)';
-const DOT_COL     = '#808ab8';
+const C1='#ff7c5c', C2='#47d9bf';
+const COLORS  = [C1,C2];
+const CFILL   = ['rgba(255,124,92,.20)','rgba(71,217,191,.20)'];
+const CSTROKE = ['rgba(255,124,92,.45)','rgba(71,217,191,.45)'];
+const EDGE_GHOST='rgba(100,110,160,.14)', DOT_COL='#808ab8';
 
 // ═══════════════════════════════════════════════════
-//  State
+//  Sound
 // ═══════════════════════════════════════════════════
-let ROWS, COLS, CELL, MARGIN;
-let hEdges, rEdges, lEdges;   // null | 0 | 1
-let upOwner, downOwner;        // null | 0 | 1
-let curPlayer, scores, gameOver, vsComputer, hover, thinking;
+let soundOn=true, audioCtx=null;
+function getAC(){ return audioCtx||(audioCtx=new(window.AudioContext||window.webkitAudioContext)()); }
+function osc(ac,freq,type,start,dur,v,freqEnd){
+  const o=ac.createOscillator(),g=ac.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,start);
+  if(freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd,start+dur);
+  g.gain.setValueAtTime(0,start); g.gain.linearRampToValueAtTime(v,start+.008); g.gain.exponentialRampToValueAtTime(.001,start+dur);
+  o.connect(g); g.connect(ac.destination); o.start(start); o.stop(start+dur+.01);
+}
+function noise(ac,start,dur,v,lpFreq){
+  const buf=ac.createBuffer(1,Math.ceil(ac.sampleRate*dur),ac.sampleRate);
+  const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const src=ac.createBufferSource(); src.buffer=buf;
+  const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=lpFreq;
+  const g=ac.createGain(); g.gain.setValueAtTime(v,start); g.gain.exponentialRampToValueAtTime(.001,start+dur);
+  src.connect(lp); lp.connect(g); g.connect(ac.destination); src.start(start); src.stop(start+dur+.01);
+}
+function playBloop(){
+  if(!soundOn) return;
+  const a=getAC(), t=a.currentTime;
+  noise(a, t, 0.07, 0.9, 4000);
+  osc(a, 200, 'sine', t, 0.09, 0.6, 80);
+}
+function playClaim(n){
+  if(!soundOn) return;
+  const a=getAC(), t=a.currentTime;
+  const chords=[[523],[523,659],[523,659,784]];
+  chords[Math.min(n-1,2)].forEach((f,i) => osc(a, f, 'sine', t+i*0.07, 0.55, 0.5));
+}
+function playWin(){ if(!soundOn) return; const a=getAC(),t=a.currentTime; [523,659,784,1047,1319].forEach((f,i)=>osc(a,f,'triangle',t+i*.13,.55,.5)); }
+function playLaserShot(){
+  if(!soundOn) return;
+  const a=getAC(), t=a.currentTime;
+  osc(a, 900, 'sawtooth', t, .12, .45, 300);
+  osc(a, 300, 'sine', t+.06, .28, .28, 140);
+}
+
+// ═══════════════════════════════════════════════════
+//  Character animation system
+// ═══════════════════════════════════════════════════
+//  Canvas size per character (CSS px)
+const CW=110, CH=120;
+// Feet position within that canvas
+const FX=42, FY=112;
+
+// State durations (ms). null = looping.
+const DURS={idle:null, active:null, firing:850, ducking:1100, spinning:740, winner:null, exploding:720};
+
+const chars=[
+  {state:'idle', stateTs:0, color:C1, isRobot:false, facing:1,  cv:null, cx2:null},
+  {state:'idle', stateTs:0, color:C2, isRobot:false, facing:-1, cv:null, cx2:null}
+];
+let charRafId=null;
+
+// ── Create canvases ──────────────────────────────
+function initCharCanvases(){
+  const dpr=window.devicePixelRatio||1;
+  for(let i=0;i<2;i++){
+    const wrap=document.getElementById(`char${i}`);
+    wrap.innerHTML='';
+    const cv=document.createElement('canvas');
+    cv.style.width=CW+'px'; cv.style.height=CH+'px';
+    cv.width=CW*dpr; cv.height=CH*dpr;
+    const cx2=cv.getContext('2d');
+    cx2.scale(dpr,dpr);
+    chars[i].cv=cv; chars[i].cx2=cx2;
+    wrap.appendChild(cv);
+  }
+}
+
+// ── Set state ──────────────────────────────────
+function setCharState(idx,state){
+  chars[idx].state=state;
+  chars[idx].stateTs=performance.now();
+}
+
+// ── Animation loop ──────────────────────────────
+function startCharLoop(){
+  if(charRafId) cancelAnimationFrame(charRafId);
+  function loop(ts){
+    for(let i=0;i<2;i++){
+      const ch=chars[i];
+      if(!ch.cv) continue;
+      const {cx2}=ch;
+      cx2.clearRect(0,0,CW,CH);
+      const elapsed=ts-ch.stateTs;
+      const dur=DURS[ch.state];
+      let phase=dur ? Math.min(1, elapsed/dur) : 0;
+
+      // Auto-transition timed states back to idle/active
+      if(phase>=1 && dur!==null){
+        const timed=['spinning','firing','ducking'];
+        if(timed.includes(ch.state)){
+          ch.state = (!gameOver && curPlayer===i) ? 'active' : 'idle';
+          ch.stateTs=ts; phase=0;
+        }
+      }
+
+      cx2.save();
+      if(ch.facing===-1){ cx2.translate(CW,0); cx2.scale(-1,1); }
+      renderChar(cx2,ts,ch.state,phase,ch.color,ch.isRobot);
+      cx2.restore();
+    }
+    drawBeams(ts);
+    charRafId=requestAnimationFrame(loop);
+  }
+  charRafId=requestAnimationFrame(loop);
+}
+
+// ── Fire laser (claim — target ducks) ──────────
+function doFire(shooterIdx){
+  setCharState(shooterIdx,'firing');
+  const targetIdx=1-shooterIdx;
+  setTimeout(()=>setCharState(targetIdx,'ducking'), 170);
+  activeBeams.push({shooterIdx, startTs:performance.now(), sparked:false, letHit:false});
+}
+
+// ── End-game: fire and kill ─────────────────────
+function triggerEndgame(winnerIdx){
+  const loserIdx=1-winnerIdx;
+  setCharState(winnerIdx,'firing');
+  setCharState(loserIdx,'idle');
+  playLaserShot();
+  activeBeams.push({shooterIdx:winnerIdx, startTs:performance.now(), sparked:false, letHit:true});
+  // loser explodes slightly after beam arrives
+  setTimeout(()=>{
+    setCharState(loserIdx,'exploding');
+    spawnParticles(loserIdx);
+  }, 460);
+  // winner settles into permanent happy state
+  setTimeout(()=>setCharState(winnerIdx,'winner'), 920);
+}
+
+// ── DOM particle burst ──────────────────────────
+function spawnParticles(idx){
+  const w=document.getElementById(`char${idx}`); if(!w) return;
+  const r=w.getBoundingClientRect();
+  const cx2=r.left+r.width/2, cy2=r.top+r.height/2;
+  const pal=[COLORS[idx],'#e0a0ff','#ffffff',COLORS[idx],'#ffd060','#fff'];
+  for(let i=0;i<30;i++){
+    const p=document.createElement('div');
+    const sz=5+Math.random()*9;
+    p.style.cssText=`position:fixed;width:${sz}px;height:${sz}px;border-radius:50%;
+      background:${pal[i%pal.length]};left:${cx2}px;top:${cy2}px;pointer-events:none;z-index:9999;`;
+    document.body.appendChild(p);
+    const ang=(i/30)*Math.PI*2+(Math.random()-.5)*.8;
+    const dist=48+Math.random()*110;
+    p.animate([
+      {transform:'translate(-50%,-50%) scale(1)',opacity:1},
+      {transform:`translate(calc(-50% + ${Math.cos(ang)*dist}px),calc(-50% + ${Math.sin(ang)*dist-30}px)) scale(0)`,opacity:0}
+    ],{duration:580+Math.random()*520,easing:'ease-out',fill:'forwards'}).finished.then(()=>p.remove());
+  }
+}
+
+// ── Laser beam overlay system ───────────────────
+let activeBeams=[];
+const BEAM_TRAVEL=320; // ms for beam head to reach target
+const BEAM_LIFE=560;   // total beam lifetime
+
+function spawnSparks(x, y, col, angle, allDirections){
+  for(let i=0;i<14;i++){
+    const p=document.createElement('div');
+    const sz=2+Math.random()*4;
+    p.style.cssText=`position:fixed;width:${sz}px;height:${sz}px;border-radius:50%;
+      background:${['#fff',col,'#ffee88',col][i%4]};left:${x}px;top:${y}px;
+      pointer-events:none;z-index:9999;`;
+    document.body.appendChild(p);
+    let a;
+    if(allDirections){
+      a=(i/14)*Math.PI*2+(Math.random()-.5)*.5; // full 360° burst
+    } else {
+      const base=angle+Math.PI/2;               // fan perpendicular to beam (wall hit)
+      a=base+(Math.random()-.5)*Math.PI*1.3;
+    }
+    const d=6+Math.random()*22;
+    p.animate([
+      {transform:'translate(-50%,-50%) scale(1)',opacity:1},
+      {transform:`translate(calc(-50% + ${Math.cos(a)*d}px),calc(-50% + ${Math.sin(a)*d}px)) scale(0)`,opacity:0}
+    ],{duration:180+Math.random()*180,easing:'ease-out',fill:'forwards'}).finished.then(()=>p.remove());
+  }
+}
+
+function drawBeams(ts){
+  const bcan=document.getElementById('beamCanvas');
+  const dpr=window.devicePixelRatio||1;
+  const iw=window.innerWidth, ih=window.innerHeight;
+  if(bcan.width!==Math.round(iw*dpr)||bcan.height!==Math.round(ih*dpr)){
+    bcan.width=Math.round(iw*dpr); bcan.height=Math.round(ih*dpr);
+    bcan.style.width=iw+'px'; bcan.style.height=ih+'px';
+  }
+  const bctx=bcan.getContext('2d');
+  bctx.setTransform(dpr,0,0,dpr,0,0);
+  bctx.clearRect(0,0,iw,ih);
+
+  activeBeams=activeBeams.filter(beam=>{
+    const elapsed=ts-beam.startTs;
+    if(elapsed>BEAM_LIFE) return false;
+
+    const sw=document.getElementById(`char${beam.shooterIdx}`).getBoundingClientRect();
+    const tc=beam.letHit
+      ? document.getElementById(`char${1-beam.shooterIdx}`).getBoundingClientRect()
+      : document.getElementById(`card${1-beam.shooterIdx}`).getBoundingClientRect();
+    const col=COLORS[beam.shooterIdx];
+
+    // muzzle: right edge of shooter wrap for P1, left edge for P2
+    const mx = beam.shooterIdx===0 ? sw.right-4 : sw.left+4;
+    const my = sw.top + sw.height*0.42;
+    // target: character torso centre for kill shot, near pcard edge for miss
+    const tx = beam.letHit
+      ? tc.left + tc.width*0.5
+      : (beam.shooterIdx===0 ? tc.left : tc.right);
+    const ty = beam.letHit
+      ? tc.top + tc.height*0.45
+      : tc.top + tc.height*0.5;
+
+    const beamAngle=Math.atan2(ty-my, tx-mx);
+    const totalDist=Math.hypot(tx-mx, ty-my);
+
+    const headT=Math.min(1, elapsed/BEAM_TRAVEL);
+    const tailT=Math.max(0, Math.min(1,(elapsed-90)/BEAM_TRAVEL));
+
+    // sparks on first frame head reaches target
+    if(!beam.sparked && headT>=1){
+      beam.sparked=true;
+      spawnSparks(tx, ty, col, beamAngle, beam.letHit);
+    }
+
+    const alpha=headT>=1 ? Math.max(0,1-(elapsed-BEAM_TRAVEL)/180) : 1;
+    if(alpha<=0) return false;
+
+    const hx=mx+(tx-mx)*headT, hy=my+(ty-my)*headT;
+    const tlx=mx+(tx-mx)*tailT, tly=my+(ty-my)*tailT;
+
+    bctx.save();
+    bctx.globalAlpha=alpha;
+    // glow pass
+    bctx.strokeStyle=col; bctx.lineWidth=5;
+    bctx.shadowColor=col; bctx.shadowBlur=12;
+    bctx.lineCap='round';
+    // animated dash offset makes it look like it's moving
+    bctx.setLineDash([14,8]);
+    bctx.lineDashOffset=-(elapsed*0.55)%(14+8);
+    bctx.beginPath(); bctx.moveTo(tlx,tly); bctx.lineTo(hx,hy); bctx.stroke();
+    // bright core
+    bctx.strokeStyle='rgba(255,255,255,0.85)'; bctx.lineWidth=2; bctx.shadowBlur=0;
+    bctx.beginPath(); bctx.moveTo(tlx,tly); bctx.lineTo(hx,hy); bctx.stroke();
+    bctx.setLineDash([]); bctx.restore();
+    return true;
+  });
+}
+
+// ── updateCharAnims (called from game logic) ────
+function updateCharAnims(){
+  if(gameOver) return;
+  for(let i=0;i<2;i++){
+    // don't cancel in-progress timed animations
+    const s=chars[i].state;
+    if(s==='spinning'||s==='firing'||s==='ducking') continue;
+    setCharState(i, curPlayer===i ? 'active' : 'idle');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  drawGun — pistol at hand pos, pointing in `angle`
+// ═══════════════════════════════════════════════════
+function drawGun(cx2, hx, hy, angle, col){
+  cx2.save();
+  cx2.translate(hx, hy);
+  cx2.rotate(angle);
+  cx2.lineCap='square';
+  // barrel
+  cx2.fillStyle='#aaa'; cx2.fillRect(2,-2,15,4);
+  // body
+  cx2.fillStyle='#888'; cx2.fillRect(-4,-3,10,6);
+  // grip
+  cx2.fillStyle='#666'; cx2.fillRect(-2,3,6,8);
+  // trigger guard (arc)
+  cx2.strokeStyle='#555'; cx2.lineWidth=1.2;
+  cx2.beginPath(); cx2.arc(1,7,3.5,Math.PI,0); cx2.stroke();
+  // muzzle highlight (player colour)
+  cx2.fillStyle=col; cx2.fillRect(16,-1.5,3,3);
+  cx2.restore();
+}
+
+// ═══════════════════════════════════════════════════
+//  renderChar  — draws one character into its canvas
+//
+//  cx2   : 2d context (already transformed for facing direction)
+//  ts    : rAF timestamp ms
+//  state : 'idle'|'active'|'firing'|'ducking'|'spinning'|'winner'|'exploding'
+//  phase : 0..1 for timed states, 0 for looping
+//  col   : player colour string
+//  robot : bool
+//
+//  Local coords: character feet at (0,0), +Y is down.
+//  Caller translates to (FX,FY) before calling.
+// ═══════════════════════════════════════════════════
+function renderChar(cx2,ts,state,phase,col,robot){
+  let bx=0, by=0, bRot=0, bScale=1, alpha=1;
+  let crouch=0, tuck=0;
+
+  if(state==='idle')   by=Math.sin(ts*.0022)*3;
+  if(state==='active') by=Math.sin(ts*.0028)*4;
+  if(state==='ducking'){
+    if(phase<.18)      crouch=phase/.18;
+    else if(phase<.75) crouch=1;
+    else               crouch=(1-phase)/.25;
+    by=crouch*16;
+  }
+  if(state==='spinning'){
+    if(phase<.18)      tuck=phase/.18;
+    else if(phase<.82) tuck=1;
+    else               tuck=(1-phase)/.18;
+    by=-Math.sin(phase*Math.PI)*22;
+  }
+  if(state==='winner') by=Math.sin(ts*.003)*3;
+  if(state==='exploding'){
+    bScale=Math.max(.001,1-phase*1.12);
+    bRot=phase*Math.PI*2.6;
+    by=-phase*24;
+    alpha=Math.max(0,1-phase*1.4);
+    if(alpha<=0||bScale<=0) return;
+  }
+
+  // ── Gun angle (0 = pointing right +X) ────────
+  let gunAngle;
+  if(state==='idle')
+    gunAngle=0.30+Math.sin(ts*.0018)*.07;
+  else if(state==='active')
+    gunAngle=-0.10;                                 // held at low-ready, no spin
+  else if(state==='firing'){
+    if(phase<.16)      gunAngle=0.30-(phase/.16)*.38;
+    else if(phase<.62) gunAngle=-0.08;
+    else               gunAngle=-0.08+((phase-.62)/.38)*.38;
+  }
+  else if(state==='ducking')
+    gunAngle=0.85+crouch*.35;
+  else if(state==='spinning')
+    gunAngle=-Math.PI/2;
+  else if(state==='winner')
+    gunAngle=-0.30+Math.sin(ts*.0035)*.12;          // relaxed celebratory sway
+  else if(state==='exploding')
+    gunAngle=phase*Math.PI*3.5;
+  else
+    gunAngle=0.30;
+
+  // Arm angle — fixed during active so only the gun rotates (finger-spin effect)
+  let armAngle;
+  if(state==='active') armAngle=-0.22;              // arm held steady
+  else armAngle=gunAngle*.5-0.20;                   // tracks gun in other states
+
+  // Leg swing
+  const lsw=Math.sin(ts*.002)*(state==='active'?.10:.04);
+
+  // ── Apply body transforms ─────────────────────
+  cx2.save();
+  cx2.globalAlpha=alpha;
+
+  if(state==='spinning'){
+    const pivY=40;
+    cx2.translate(FX, FY-pivY+by);
+    cx2.rotate(phase*Math.PI*2);
+    cx2.translate(0, pivY);
+  } else {
+    cx2.translate(FX+bx, FY+by);
+    cx2.translate(0,-28); cx2.rotate(bRot); cx2.translate(0,28);
+    cx2.scale(bScale,bScale);
+  }
+
+  cx2.lineCap='round'; cx2.lineJoin='round';
+
+  // ── Shoulder level and foot positions ────────
+  const spineLen=23-crouch*10;
+  const shldr=-28-spineLen;
+  const legLen=28-crouch*11;
+  const lFootX=-14+lsw*(-7), lFootY=-28+legLen;
+  const rFootX= 14+lsw*(7),  rFootY=-28+legLen;
+  const lfx=tuck ? lFootX+(-8-lFootX)*tuck : lFootX;
+  const lfy=tuck ? lFootY+(-44-lFootY)*tuck : lFootY;
+  const rfx=tuck ? rFootX+(8-rFootX)*tuck  : rFootX;
+  const rfy=tuck ? rFootY+(-44-rFootY)*tuck : rFootY;
+
+  // ── Shared arm / hand positions ───────────────
+  const oa=Math.PI*.62+Math.sin(ts*.002+1.1)*.15;
+  const oaxN=-3-Math.cos(oa)*13, oayN=shldr+1+Math.sin(oa)*13;
+  const oaxT=-10, oayT=shldr-2;
+  const oax=oaxN+(oaxT-oaxN)*tuck, oay=oayN+(oayT-oayN)*tuck;
+  const AL=14;
+  const handX=4+Math.cos(armAngle)*AL;
+  const handY=shldr+1+Math.sin(armAngle)*AL;
+
+  // ── Palette ───────────────────────────────────
+  const C_TROUSER=col, C_SEAM='rgba(0,0,0,0.18)';
+  const C_BOOT='#232640',    C_BOOT_HI='#353a5c';
+  const C_BELT='#e0a0ff',    C_BUCKLE='#fff8e0';
+  const C_DARK='#0b0c14',    C_PANEL='rgba(0,0,0,0.30)';
+  const C_RIVET='rgba(255,255,255,0.18)';
+
+  // ── Boots ─────────────────────────────────────
+  for(const [fx,fy] of [[lfx,lfy],[rfx,rfy]]){
+    cx2.save(); cx2.translate(fx,fy);
+    cx2.fillStyle=C_BOOT;
+    cx2.beginPath(); cx2.roundRect(-6,-4,14,8,3); cx2.fill();
+    cx2.fillStyle=C_BOOT_HI; cx2.fillRect(-5,-4,12,3);
+    cx2.restore();
+  }
+
+  // ── Trouser legs ──────────────────────────────
+  cx2.strokeStyle=C_TROUSER; cx2.lineWidth=10;
+  cx2.beginPath(); cx2.moveTo(-5,-28); cx2.lineTo(lfx,lfy); cx2.stroke();
+  cx2.beginPath(); cx2.moveTo(5,-28);  cx2.lineTo(rfx,rfy); cx2.stroke();
+  cx2.strokeStyle=C_SEAM; cx2.lineWidth=2;
+  cx2.beginPath(); cx2.moveTo(-4,-28); cx2.lineTo(lfx,lfy); cx2.stroke();
+  cx2.beginPath(); cx2.moveTo(4,-28);  cx2.lineTo(rfx,rfy); cx2.stroke();
+
+  if(robot){
+    // ── Robot chest plate ──────────────────────
+    cx2.fillStyle=C_DARK;
+    cx2.beginPath();
+    cx2.moveTo(-13,shldr+1); cx2.lineTo(13,shldr+1);
+    cx2.lineTo(10,-27); cx2.lineTo(-10,-27);
+    cx2.closePath(); cx2.fill();
+    cx2.strokeStyle=col; cx2.lineWidth=2; cx2.stroke();
+
+    // Panel dividers
+    cx2.strokeStyle=C_RIVET; cx2.lineWidth=1;
+    cx2.beginPath(); cx2.moveTo(-6,shldr+4); cx2.lineTo(-6,-27); cx2.stroke();
+    cx2.beginPath(); cx2.moveTo(6,shldr+4);  cx2.lineTo(6,-27);  cx2.stroke();
+    cx2.beginPath(); cx2.moveTo(-10,shldr+11); cx2.lineTo(10,shldr+11); cx2.stroke();
+
+    // Power core
+    const coreY=shldr+7;
+    cx2.fillStyle=col;
+    cx2.beginPath(); cx2.arc(0,coreY,4.5,0,Math.PI*2); cx2.fill();
+    cx2.fillStyle='#fff';
+    cx2.beginPath(); cx2.arc(0,coreY,2,0,Math.PI*2); cx2.fill();
+
+    // Shoulder joints
+    for(const sx of [-13,13]){
+      cx2.fillStyle=col;
+      cx2.beginPath(); cx2.arc(sx,shldr+2,6,0,Math.PI*2); cx2.fill();
+      cx2.fillStyle=C_DARK;
+      cx2.beginPath(); cx2.arc(sx,shldr+2,3.5,0,Math.PI*2); cx2.fill();
+    }
+
+    // Waist band
+    cx2.fillStyle=col; cx2.fillRect(-10,-30,20,5);
+    cx2.fillStyle=C_DARK; cx2.fillRect(-3,-30,6,5);
+
+    // Non-gun arm (segmented)
+    cx2.strokeStyle=col; cx2.lineWidth=7;
+    cx2.beginPath(); cx2.moveTo(-13,shldr+2); cx2.lineTo(oax,oay); cx2.stroke();
+    cx2.fillStyle=C_DARK;
+    cx2.beginPath(); cx2.arc(oax,oay,3.5,0,Math.PI*2); cx2.fill();
+
+    // Gun arm (segmented)
+    const emx=13+(handX-13)*.5, emy=shldr+2+(handY-(shldr+2))*.5;
+    cx2.strokeStyle=col; cx2.lineWidth=7;
+    cx2.beginPath(); cx2.moveTo(13,shldr+2); cx2.lineTo(handX,handY); cx2.stroke();
+    cx2.fillStyle=C_DARK;
+    cx2.beginPath(); cx2.arc(emx,emy,3.5,0,Math.PI*2); cx2.fill();
+    // Hand
+    cx2.fillStyle=col;
+    cx2.beginPath(); cx2.arc(handX,handY,4.5,0,Math.PI*2); cx2.fill();
+
+  } else {
+    // ── Human jacket (trapezoid fill) ──────────
+    cx2.fillStyle=col;
+    cx2.beginPath();
+    cx2.moveTo(-12,shldr+1); cx2.lineTo(12,shldr+1);
+    cx2.lineTo(9,-27); cx2.lineTo(-9,-27);
+    cx2.closePath(); cx2.fill();
+
+    // Dark inner chest panel (vest / undershirt)
+    cx2.fillStyle=C_PANEL;
+    cx2.beginPath();
+    cx2.moveTo(-4,shldr+1); cx2.lineTo(4,shldr+1);
+    cx2.lineTo(3,-27); cx2.lineTo(-3,-27);
+    cx2.closePath(); cx2.fill();
+
+    // Shoulder seam lines
+    cx2.strokeStyle='rgba(0,0,0,0.25)'; cx2.lineWidth=1.5;
+    cx2.beginPath(); cx2.moveTo(-12,shldr+1); cx2.lineTo(-9,-27); cx2.stroke();
+    cx2.beginPath(); cx2.moveTo(12,shldr+1);  cx2.lineTo(9,-27);  cx2.stroke();
+
+    // Small chest pocket
+    cx2.strokeStyle='rgba(0,0,0,0.22)'; cx2.lineWidth=1.2;
+    cx2.strokeRect(5,shldr+5,6,5);
+
+    // Belt
+    cx2.fillStyle=C_BELT; cx2.fillRect(-10,-31,20,5);
+    cx2.fillStyle=C_BUCKLE; cx2.fillRect(-3,-31,6,5);
+    cx2.strokeStyle='rgba(0,0,0,0.35)'; cx2.lineWidth=1; cx2.strokeRect(-3,-31,6,5);
+
+    // Non-gun sleeve
+    cx2.strokeStyle=col; cx2.lineWidth=8;
+    cx2.beginPath(); cx2.moveTo(-12,shldr+2); cx2.lineTo(oax,oay); cx2.stroke();
+    // Cuff
+    cx2.strokeStyle='rgba(255,255,255,0.22)'; cx2.lineWidth=3;
+    cx2.beginPath(); cx2.moveTo(oax,oay); cx2.lineTo(oax,oay+1); cx2.stroke();
+
+    // Gun sleeve
+    cx2.strokeStyle=col; cx2.lineWidth=8;
+    cx2.beginPath(); cx2.moveTo(12,shldr+2); cx2.lineTo(handX,handY); cx2.stroke();
+    // Hand
+    cx2.fillStyle=col;
+    cx2.beginPath(); cx2.arc(handX,handY,4,0,Math.PI*2); cx2.fill();
+  }
+
+  // ── Gun ───────────────────────────────────────
+  drawGun(cx2,handX,handY,gunAngle,col);
+
+  // ── Muzzle flash ──────────────────────────────
+  if(state==='firing'&&phase>.14&&phase<.30){
+    const flashA=(phase-.14)/.16;
+    const mxf=handX+Math.cos(gunAngle)*22, myf=handY+Math.sin(gunAngle)*22;
+    cx2.save();
+    cx2.globalAlpha=alpha*(1-flashA)*.9;
+    cx2.fillStyle='#fff';
+    cx2.beginPath(); cx2.arc(mxf,myf,5*(1-flashA*.6),0,Math.PI*2); cx2.fill();
+    cx2.restore();
+  }
+
+  // ── Head ──────────────────────────────────────
+  const HCY=shldr-11;
+  cx2.save();
+  if(robot){
+    cx2.fillStyle=col;
+    cx2.beginPath(); cx2.roundRect(-11,HCY-11,22,22,3); cx2.fill();
+    cx2.strokeStyle=col; cx2.lineWidth=1.9;
+    cx2.beginPath(); cx2.moveTo(-5,HCY-11); cx2.lineTo(-5,HCY-18); cx2.stroke();
+    cx2.beginPath(); cx2.moveTo(5, HCY-11); cx2.lineTo(5, HCY-18); cx2.stroke();
+    cx2.fillStyle=col;
+    cx2.beginPath(); cx2.arc(-5,HCY-18,2.4,0,Math.PI*2); cx2.fill();
+    cx2.beginPath(); cx2.arc(5, HCY-18,2.4,0,Math.PI*2); cx2.fill();
+    cx2.fillStyle=C_DARK; cx2.fillRect(-9,HCY-7,7.5,5); cx2.fillRect(1.5,HCY-7,7.5,5);
+    const blink=Math.floor(ts/110)%33!==0;
+    if(blink){cx2.fillStyle='#e0a0ff';cx2.fillRect(-8,HCY-6,5.5,3);cx2.fillRect(2.5,HCY-6,5.5,3);}
+    cx2.strokeStyle=C_DARK; cx2.lineWidth=1.8; cx2.lineCap='round';
+    cx2.beginPath();
+    if(state==='winner')      cx2.arc(0,HCY+4,5,.18,Math.PI-.18);
+    else if(state==='firing') cx2.arc(0,HCY+4,4,.3,Math.PI-.3);
+    else if(state==='exploding') cx2.arc(0,HCY+9,4,Math.PI+.3,-.3);
+    else cx2.rect(-7,HCY+6,14,2);
+    cx2.stroke();
+  } else {
+    cx2.fillStyle=col;
+    cx2.beginPath(); cx2.arc(0,HCY,10,0,Math.PI*2); cx2.fill();
+    cx2.fillStyle=C_DARK;
+    cx2.beginPath(); cx2.arc(-3.5,HCY-2,1.9,0,Math.PI*2); cx2.fill();
+    cx2.beginPath(); cx2.arc(3.5, HCY-2,1.9,0,Math.PI*2); cx2.fill();
+    cx2.strokeStyle=C_DARK; cx2.lineWidth=1.6; cx2.lineCap='round';
+    cx2.beginPath();
+    if(state==='winner')         cx2.arc(0,HCY,5,.18,Math.PI-.18);
+    else if(state==='firing')    cx2.arc(0,HCY,4,.3,Math.PI-.3);
+    else if(state==='exploding') cx2.arc(0,HCY+7,5,Math.PI+.22,-.22);
+    else{cx2.moveTo(-4,HCY+4); cx2.lineTo(4,HCY+4);}
+    cx2.stroke();
+  }
+  cx2.restore();
+
+  cx2.restore(); // body transform
+}
+
+// ═══════════════════════════════════════════════════
+//  Game state
+// ═══════════════════════════════════════════════════
+let ROWS,COLS,CELL,MARGIN;
+let hEdges,rEdges,lEdges,upOwner,downOwner;
+let curPlayer,scores,gameOver,vsComputer,hover,thinking,lastEdge;
+function mkMat(r,c,v){return Array.from({length:r},()=>new Array(c).fill(v));}
 
 // ═══════════════════════════════════════════════════
 //  Init
 // ═══════════════════════════════════════════════════
-function mkMat(r, c, v) {
-  return Array.from({length: r}, () => new Array(c).fill(v));
-}
+function initGame(){
+  const sz=parseInt(document.getElementById('szSel').value);
+  ROWS=sz; COLS=sz;
+  const dpr=window.devicePixelRatio||1;
+  CELL=76; MARGIN=Math.round(CELL*.65);
+  const Hpx=CELL*Math.sqrt(3)/2;
+  const cssW=Math.ceil(COLS*CELL+ROWS*CELL/2+MARGIN*2);
+  const cssH=Math.ceil(ROWS*Hpx+MARGIN*2);
+  canvas.style.width=cssW+'px'; canvas.style.height=cssH+'px';
+  canvas.width=cssW*dpr; canvas.height=cssH*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
 
-function initGame() {
-  const sz = parseInt(document.getElementById('szSel').value);
-  ROWS = sz; COLS = sz;
+  hEdges=mkMat(ROWS+1,COLS,null); rEdges=mkMat(ROWS,COLS+1,null); lEdges=mkMat(ROWS,COLS,null);
+  upOwner=mkMat(ROWS,COLS,null); downOwner=mkMat(ROWS,COLS,null);
 
-  const dpr = window.devicePixelRatio || 1;
-  CELL = 76;
-  MARGIN = Math.round(CELL * 0.65);
+  curPlayer=vsComputer?Math.floor(Math.random()*2):0;
+  scores=[0,0]; gameOver=false; hover=null; thinking=false; lastEdge=null;
 
-  const Hpx = CELL * Math.sqrt(3) / 2;
-  const cssW = Math.ceil(COLS * CELL + ROWS * CELL / 2 + MARGIN * 2);
-  const cssH = Math.ceil(ROWS * Hpx + MARGIN * 2);
+  // Reset character canvases
+  chars[1].isRobot=vsComputer;
+  initCharCanvases();
+  // Reset wrapper CSS transforms
+  document.getElementById('char0').style.transform='';
+  document.getElementById('char1').style.transform='';
+  setCharState(0, curPlayer===0?'active':'idle');
+  setCharState(1, curPlayer===1?'active':'idle');
+  if(!charRafId) startCharLoop();
 
-  canvas.style.width  = cssW + 'px';
-  canvas.style.height = cssH + 'px';
-  canvas.width  = cssW * dpr;
-  canvas.height = cssH * dpr;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  refreshUI(0); draw();
 
-  hEdges   = mkMat(ROWS + 1, COLS, null);
-  rEdges   = mkMat(ROWS, COLS + 1, null);
-  lEdges   = mkMat(ROWS, COLS, null);
-  upOwner  = mkMat(ROWS, COLS, null);
-  downOwner= mkMat(ROWS, COLS, null);
-
-  curPlayer = 0; scores = [0, 0];
-  gameOver  = false; hover = null; thinking = false;
-
-  refreshUI(0);
-  draw();
+  if(vsComputer&&curPlayer===1){
+    thinking=true;
+    setTimeout(()=>{ thinking=false; const mv=bestMove(); if(mv) makeMove(mv); },600);
+  }
 }
 
 // ═══════════════════════════════════════════════════
-//  Geometry helpers
+//  Geometry
 // ═══════════════════════════════════════════════════
-function dotXY(r, c) {
-  return {
-    x: MARGIN + c * CELL + r * CELL / 2,
-    y: MARGIN + r * CELL * Math.sqrt(3) / 2
-  };
+function dotXY(r,c){return{x:MARGIN+c*CELL+r*CELL/2,y:MARGIN+r*CELL*Math.sqrt(3)/2};}
+function edgePts(e){
+  const{type:t,r,c}=e;
+  if(t==='H') return{p1:dotXY(r,c),  p2:dotXY(r,c+1)};
+  if(t==='R') return{p1:dotXY(r,c),  p2:dotXY(r+1,c)};
+  return            {p1:dotXY(r,c+1),p2:dotXY(r+1,c)};
 }
-
-function edgePts(e) {
-  let p1, p2;
-  const {type: t, r, c} = e;
-  if (t === 'H') { p1 = dotXY(r, c);   p2 = dotXY(r, c+1); }
-  else if (t === 'R') { p1 = dotXY(r, c); p2 = dotXY(r+1, c); }
-  else            { p1 = dotXY(r, c+1); p2 = dotXY(r+1, c); }  // L
-  return { p1, p2 };
-}
-
-function triCentroid(pts) {
-  return {
-    x: (pts[0].x + pts[1].x + pts[2].x) / 3,
-    y: (pts[0].y + pts[1].y + pts[2].y) / 3
-  };
-}
-
-function distSeg(px, py, ax, ay, bx, by) {
-  const dx = bx-ax, dy = by-ay, l2 = dx*dx+dy*dy;
-  if (!l2) return Math.hypot(px-ax, py-ay);
-  const t = Math.max(0, Math.min(1, ((px-ax)*dx + (py-ay)*dy) / l2));
-  return Math.hypot(px-(ax+t*dx), py-(ay+t*dy));
+function triCentroid(pts){return{x:(pts[0].x+pts[1].x+pts[2].x)/3,y:(pts[0].y+pts[1].y+pts[2].y)/3};}
+function distSeg(px,py,ax,ay,bx,by){
+  const dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy;
+  if(!l2) return Math.hypot(px-ax,py-ay);
+  const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/l2));
+  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
 }
 
 // ═══════════════════════════════════════════════════
 //  Edge accessors
 // ═══════════════════════════════════════════════════
-function getE(e) {
-  if (e.type==='H') return hEdges[e.r][e.c];
-  if (e.type==='R') return rEdges[e.r][e.c];
-  return lEdges[e.r][e.c];
+function getE(e){if(e.type==='H') return hEdges[e.r][e.c];if(e.type==='R') return rEdges[e.r][e.c];return lEdges[e.r][e.c];}
+function setE(e,v){if(e.type==='H') hEdges[e.r][e.c]=v;else if(e.type==='R') rEdges[e.r][e.c]=v;else lEdges[e.r][e.c]=v;}
+function eqE(a,b){return a&&b&&a.type===b.type&&a.r===b.r&&a.c===b.c;}
+function allFreeEdges(){
+  const o=[];
+  for(let r=0;r<=ROWS;r++) for(let c=0;c<COLS;c++)  if(hEdges[r][c]===null) o.push({type:'H',r,c});
+  for(let r=0;r<ROWS;r++)  for(let c=0;c<=COLS;c++) if(rEdges[r][c]===null) o.push({type:'R',r,c});
+  for(let r=0;r<ROWS;r++)  for(let c=0;c<COLS;c++)  if(lEdges[r][c]===null) o.push({type:'L',r,c});
+  return o;
 }
-function setE(e, v) {
-  if (e.type==='H') hEdges[e.r][e.c] = v;
-  else if (e.type==='R') rEdges[e.r][e.c] = v;
-  else lEdges[e.r][e.c] = v;
-}
-function eqE(a, b) {
-  return a && b && a.type===b.type && a.r===b.r && a.c===b.c;
-}
-
-function allFreeEdges() {
-  const out = [];
-  for (let r=0;r<=ROWS;r++) for (let c=0;c<COLS;c++)   if (hEdges[r][c]===null) out.push({type:'H',r,c});
-  for (let r=0;r<ROWS;r++)  for (let c=0;c<=COLS;c++)  if (rEdges[r][c]===null) out.push({type:'R',r,c});
-  for (let r=0;r<ROWS;r++)  for (let c=0;c<COLS;c++)   if (lEdges[r][c]===null) out.push({type:'L',r,c});
-  return out;
-}
-function allEdges() {
-  const out = [];
-  for (let r=0;r<=ROWS;r++) for (let c=0;c<COLS;c++)  out.push({type:'H',r,c});
-  for (let r=0;r<ROWS;r++)  for (let c=0;c<=COLS;c++) out.push({type:'R',r,c});
-  for (let r=0;r<ROWS;r++)  for (let c=0;c<COLS;c++)  out.push({type:'L',r,c});
-  return out;
+function allEdges(){
+  const o=[];
+  for(let r=0;r<=ROWS;r++) for(let c=0;c<COLS;c++)  o.push({type:'H',r,c});
+  for(let r=0;r<ROWS;r++)  for(let c=0;c<=COLS;c++) o.push({type:'R',r,c});
+  for(let r=0;r<ROWS;r++)  for(let c=0;c<COLS;c++)  o.push({type:'L',r,c});
+  return o;
 }
 
 // ═══════════════════════════════════════════════════
-//  Triangle completion checks
+//  Triangle checks
 // ═══════════════════════════════════════════════════
-// Up-triangle (r,c): vertices (r,c) (r,c+1) (r+1,c)
-//   edges: H[r][c], R[r][c], L[r][c]
-// Down-triangle (r,c): vertices (r,c+1) (r+1,c) (r+1,c+1)
-//   edges: L[r][c], H[r+1][c], R[r][c+1]
-
-function upOk(r,c) {
-  return r>=0&&r<ROWS&&c>=0&&c<COLS&&upOwner[r][c]===null
-    && hEdges[r][c]!==null && rEdges[r][c]!==null && lEdges[r][c]!==null;
-}
-function downOk(r,c) {
-  return r>=0&&r<ROWS&&c>=0&&c<COLS&&downOwner[r][c]===null
-    && lEdges[r][c]!==null && hEdges[r+1][c]!==null && rEdges[r][c+1]!==null;
-}
-
-function upEdgeCount(r,c) {
-  if (r<0||r>=ROWS||c<0||c>=COLS||upOwner[r][c]!==null) return -1;
-  return (hEdges[r][c]!==null?1:0)+(rEdges[r][c]!==null?1:0)+(lEdges[r][c]!==null?1:0);
-}
-function downEdgeCount(r,c) {
-  if (r<0||r>=ROWS||c<0||c>=COLS||downOwner[r][c]!==null) return -1;
-  return (lEdges[r][c]!==null?1:0)+(hEdges[r+1][c]!==null?1:0)+(rEdges[r][c+1]!==null?1:0);
-}
-
-// Triangles that contain edge e
-function trisOf(e) {
-  const {type:t, r, c} = e;
-  if (t==='H') return [{up:true,r,c},{up:false,r:r-1,c}];
-  if (t==='R') return [{up:true,r,c},{up:false,r,c:c-1}];
-  return [{up:true,r,c},{up:false,r,c}]; // L
-}
-function validTri({up,r,c}) {
-  return r>=0&&r<ROWS&&c>=0&&c<COLS;
-}
+function upOk(r,c){return r>=0&&r<ROWS&&c>=0&&c<COLS&&upOwner[r][c]===null&&hEdges[r][c]!==null&&rEdges[r][c]!==null&&lEdges[r][c]!==null;}
+function downOk(r,c){return r>=0&&r<ROWS&&c>=0&&c<COLS&&downOwner[r][c]===null&&lEdges[r][c]!==null&&hEdges[r+1][c]!==null&&rEdges[r][c+1]!==null;}
+function upEC(r,c){if(r<0||r>=ROWS||c<0||c>=COLS||upOwner[r][c]!==null) return -1;return(hEdges[r][c]!==null?1:0)+(rEdges[r][c]!==null?1:0)+(lEdges[r][c]!==null?1:0);}
+function downEC(r,c){if(r<0||r>=ROWS||c<0||c>=COLS||downOwner[r][c]!==null) return -1;return(lEdges[r][c]!==null?1:0)+(hEdges[r+1][c]!==null?1:0)+(rEdges[r][c+1]!==null?1:0);}
+function trisOf(e){const{type:t,r,c}=e;if(t==='H') return[{up:true,r,c},{up:false,r:r-1,c}];if(t==='R') return[{up:true,r,c},{up:false,r,c:c-1}];return[{up:true,r,c},{up:false,r,c}];}
+function validTri({r,c}){return r>=0&&r<ROWS&&c>=0&&c<COLS;}
 
 // ═══════════════════════════════════════════════════
 //  Core move
 // ═══════════════════════════════════════════════════
-function makeMove(edge) {
-  if (getE(edge)!==null || gameOver || thinking) return false;
-  setE(edge, curPlayer);
-
-  let claimed = 0;
-  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
-    if (upOk(r,c))  { upOwner[r][c]   = curPlayer; claimed++; }
-    if (downOk(r,c)){ downOwner[r][c] = curPlayer; claimed++; }
+function makeMove(edge){
+  if(getE(edge)!==null||gameOver||thinking) return false;
+  lastEdge=edge; setE(edge,curPlayer);
+  let claimed=0;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(upOk(r,c))   {upOwner[r][c]=curPlayer;   claimed++;}
+    if(downOk(r,c)) {downOwner[r][c]=curPlayer; claimed++;}
   }
-  scores[curPlayer] += claimed;
+  scores[curPlayer]+=claimed;
+  const total=ROWS*COLS*2;
+  gameOver=(scores[0]+scores[1]===total);
+  if(!gameOver&&claimed===0) curPlayer=1-curPlayer;
 
-  const total = ROWS * COLS * 2;
-  gameOver = (scores[0] + scores[1] === total);
+  // Sound
+  if(gameOver) playWin(); else if(claimed) playClaim(claimed); else playBloop();
 
-  if (!gameOver && claimed === 0) curPlayer = 1 - curPlayer;
+  draw(); refreshUI(claimed);
 
-  draw();
-  refreshUI(claimed);
+  // Animations
+  if(gameOver && scores[0]!==scores[1]){
+    // Last triangle claimed — skip normal fire/duck, go straight to end sequence
+    setTimeout(()=>triggerEndgame(scores[0]>scores[1]?0:1), 160);
+  } else if(claimed>0){
+    doFire(curPlayer);
+  }
 
-  if (!gameOver && vsComputer && curPlayer === 1) {
-    thinking = true;
-    setTimeout(() => {
-      thinking = false;
-      const mv = bestMove();
-      if (mv) makeMove(mv);
-    }, 480);
+  if(!gameOver&&vsComputer&&curPlayer===1){
+    thinking=true;
+    setTimeout(()=>{thinking=false;const mv=bestMove();if(mv) makeMove(mv);},480);
   }
   return true;
 }
@@ -454,270 +888,172 @@ function makeMove(edge) {
 // ═══════════════════════════════════════════════════
 //  CPU AI
 // ═══════════════════════════════════════════════════
-function bestMove() {
-  const free = allFreeEdges();
-  if (!free.length) return null;
-
-  // 1. Complete a triangle now
-  for (const e of free) {
-    setE(e, 1);
-    const wins = trisOf(e).filter(validTri).some(({up,r,c}) => up ? upOk(r,c) : downOk(r,c));
-    setE(e, null);
-    if (wins) return e;
-  }
-
-  // 2. Safe: don't leave any triangle at 2 edges
-  const safe = free.filter(e => {
-    setE(e, 1);
-    const danger = trisOf(e).filter(validTri).some(({up,r,c}) =>
-      (up ? upEdgeCount(r,c) : downEdgeCount(r,c)) === 2
-    );
-    setE(e, null);
-    return !danger;
-  });
-  if (safe.length) return safe[Math.floor(Math.random() * safe.length)];
-
-  // 3. Sacrifice minimum: pick edge opening fewest 2-edge triangles
-  free.sort((a, b) => {
-    const cnt = e => {
-      setE(e, 1);
-      const n = trisOf(e).filter(validTri).filter(({up,r,c}) =>
-        (up ? upEdgeCount(r,c) : downEdgeCount(r,c)) === 2
-      ).length;
-      setE(e, null);
-      return n;
-    };
-    return cnt(a) - cnt(b);
+function bestMove(){
+  const free=allFreeEdges(); if(!free.length) return null;
+  for(const e of free){setE(e,1);const w=trisOf(e).filter(validTri).some(({up,r,c})=>up?upOk(r,c):downOk(r,c));setE(e,null);if(w) return e;}
+  const safe=free.filter(e=>{setE(e,1);const d=trisOf(e).filter(validTri).some(({up,r,c})=>(up?upEC(r,c):downEC(r,c))===2);setE(e,null);return!d;});
+  if(safe.length) return safe[Math.floor(Math.random()*safe.length)];
+  free.sort((a,b)=>{
+    const cnt=e=>{setE(e,1);const n=trisOf(e).filter(validTri).filter(({up,r,c})=>(up?upEC(r,c):downEC(r,c))===2).length;setE(e,null);return n;};
+    return cnt(a)-cnt(b);
   });
   return free[0];
 }
 
 // ═══════════════════════════════════════════════════
-//  Nearest edge to click/touch
+//  Nearest edge
 // ═══════════════════════════════════════════════════
-function nearestEdge(mx, my) {
-  let best = null, bestD = CELL * 0.44;
-  for (const e of allEdges()) {
-    if (getE(e) !== null) continue;
-    const {p1, p2} = edgePts(e);
-    const d = distSeg(mx, my, p1.x, p1.y, p2.x, p2.y);
-    if (d < bestD) { bestD = d; best = e; }
+function nearestEdge(mx,my){
+  let best=null,bestD=CELL*.44;
+  for(const e of allEdges()){
+    if(getE(e)!==null) continue;
+    const{p1,p2}=edgePts(e);
+    const d=distSeg(mx,my,p1.x,p1.y,p2.x,p2.y);
+    if(d<bestD){bestD=d;best=e;}
   }
   return best;
 }
 
 // ═══════════════════════════════════════════════════
-//  Draw
+//  Game canvas draw
 // ═══════════════════════════════════════════════════
-function draw() {
-  const cssW = parseFloat(canvas.style.width);
-  const cssH = parseFloat(canvas.style.height);
-  ctx.clearRect(0, 0, cssW, cssH);
+function draw(){
+  const cw=parseFloat(canvas.style.width),ch=parseFloat(canvas.style.height);
+  ctx.clearRect(0,0,cw,ch);
+  ctx.fillStyle='#0b0c14'; ctx.fillRect(0,0,cw,ch);
 
-  // Background
-  ctx.fillStyle = '#0b0c14';
-  ctx.fillRect(0, 0, cssW, cssH);
-
-  // ── Claimed triangles ────────────────────────
-  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
-    if (upOwner[r][c] !== null) {
-      drawTri(
-        [dotXY(r,c), dotXY(r,c+1), dotXY(r+1,c)],
-        CFILL[upOwner[r][c]],
-        CSTROKE[upOwner[r][c]]
-      );
-    }
-    if (downOwner[r][c] !== null) {
-      drawTri(
-        [dotXY(r,c+1), dotXY(r+1,c), dotXY(r+1,c+1)],
-        CFILL[downOwner[r][c]],
-        CSTROKE[downOwner[r][c]]
-      );
-    }
+  // Claimed triangle fills
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(upOwner[r][c]!==null)   drawTri([dotXY(r,c),dotXY(r,c+1),dotXY(r+1,c)],   CFILL[upOwner[r][c]],  CSTROKE[upOwner[r][c]]);
+    if(downOwner[r][c]!==null) drawTri([dotXY(r,c+1),dotXY(r+1,c),dotXY(r+1,c+1)],CFILL[downOwner[r][c]],CSTROKE[downOwner[r][c]]);
   }
 
-  // ── Player number in claimed triangle ──────
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const tFontSize = Math.max(9, Math.round(CELL * 0.18));
-  ctx.font = `700 ${tFontSize}px 'DM Mono', monospace`;
-  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
-    if (upOwner[r][c] !== null) {
-      const cen = triCentroid([dotXY(r,c), dotXY(r,c+1), dotXY(r+1,c)]);
-      ctx.fillStyle = COLORS[upOwner[r][c]];
-      ctx.globalAlpha = 0.5;
-      ctx.fillText(vsComputer && upOwner[r][c]===1 ? 'C' : (upOwner[r][c]+1)+'', cen.x, cen.y);
-    }
-    if (downOwner[r][c] !== null) {
-      const cen = triCentroid([dotXY(r,c+1), dotXY(r+1,c), dotXY(r+1,c+1)]);
-      ctx.fillStyle = COLORS[downOwner[r][c]];
-      ctx.globalAlpha = 0.5;
-      ctx.fillText(vsComputer && downOwner[r][c]===1 ? 'C' : (downOwner[r][c]+1)+'', cen.x, cen.y);
-    }
+  // Triangle labels
+  ctx.save();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font=`700 ${Math.max(9,Math.round(CELL*.18))}px 'DM Mono',monospace`;
+  ctx.globalAlpha=.5;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(upOwner[r][c]!==null){const cen=triCentroid([dotXY(r,c),dotXY(r,c+1),dotXY(r+1,c)]);ctx.fillStyle=COLORS[upOwner[r][c]];ctx.fillText(vsComputer&&upOwner[r][c]===1?'C':(upOwner[r][c]+1)+'',cen.x,cen.y);}
+    if(downOwner[r][c]!==null){const cen=triCentroid([dotXY(r,c+1),dotXY(r+1,c),dotXY(r+1,c+1)]);ctx.fillStyle=COLORS[downOwner[r][c]];ctx.fillText(vsComputer&&downOwner[r][c]===1?'C':(downOwner[r][c]+1)+'',cen.x,cen.y);}
   }
-  ctx.globalAlpha = 1;
+  ctx.restore();
 
-  // ── Edges ───────────────────────────────────
-  ctx.lineCap = 'round';
-  for (const e of allEdges()) {
-    const state = getE(e);
-    const isHov = eqE(e, hover);
-    const {p1, p2} = edgePts(e);
-    ctx.beginPath();
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(p2.x, p2.y);
-
-    if (state !== null) {
-      ctx.strokeStyle = EDGE_DRAWN;
-      ctx.lineWidth   = CELL * 0.09;
-      ctx.globalAlpha = 0.88;
-      ctx.setLineDash([]);
-    } else if (isHov) {
-      ctx.strokeStyle = COLORS[curPlayer];
-      ctx.lineWidth   = CELL * 0.12;
-      ctx.globalAlpha = 0.9;
-      ctx.setLineDash([]);
-      // glow
-      ctx.shadowColor = COLORS[curPlayer];
-      ctx.shadowBlur  = CELL * 0.5;
-    } else {
-      ctx.strokeStyle = EDGE_GHOST;
-      ctx.lineWidth   = CELL * 0.03;
-      ctx.globalAlpha = 1;
-      ctx.setLineDash([CELL*0.055, CELL*0.085]);
+  // Edges
+  ctx.save();
+  ctx.lineCap='round';
+  for(const e of allEdges()){
+    const state=getE(e),isHov=eqE(e,hover);
+    const{p1,p2}=edgePts(e);
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y);
+    if(state!==null){
+      const il=eqE(e,lastEdge);
+      ctx.strokeStyle=COLORS[state];
+      ctx.lineWidth=il?CELL*.16:CELL*.09;
+      ctx.globalAlpha=.98;
+    }else if(isHov){
+      ctx.strokeStyle=COLORS[curPlayer];
+      ctx.lineWidth=CELL*.12;
+      ctx.globalAlpha=.9;
+    }else{
+      ctx.strokeStyle=EDGE_GHOST;
+      ctx.lineWidth=CELL*.03;
+      ctx.setLineDash([CELL*.055,CELL*.085]);
     }
     ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.shadowBlur  = 0;
-    ctx.globalAlpha = 1;
+    ctx.restore();
   }
+  ctx.restore();
 
-  // ── Dots ────────────────────────────────────
-  const dotR = CELL * 0.072;
-  for (let r=0;r<=ROWS;r++) for (let c=0;c<=COLS;c++) {
-    const p = dotXY(r, c);
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, dotR, 0, Math.PI*2);
-    ctx.fillStyle = DOT_COL;
-    ctx.shadowColor = 'rgba(140,155,210,0.5)';
-    ctx.shadowBlur  = dotR * 2;
+  // Dots — drawn last so they sit on top cleanly
+  ctx.save();
+  const dotR=CELL*.072;
+  ctx.fillStyle=DOT_COL;
+  for(let r=0;r<=ROWS;r++) for(let c=0;c<=COLS;c++){
+    const p=dotXY(r,c);
+    ctx.beginPath(); ctx.arc(p.x,p.y,dotR,0,Math.PI*2);
     ctx.fill();
-    ctx.shadowBlur  = 0;
+  }
+  ctx.restore();
+}
+function drawTri(pts,fill,stroke){
+  ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); ctx.lineTo(pts[1].x,pts[1].y); ctx.lineTo(pts[2].x,pts[2].y); ctx.closePath();
+  ctx.fillStyle=fill; ctx.fill();
+  ctx.strokeStyle=stroke; ctx.lineWidth=.5; ctx.globalAlpha=.35; ctx.stroke(); ctx.globalAlpha=1;
+}
+
+// ═══════════════════════════════════════════════════
+//  UI
+// ═══════════════════════════════════════════════════
+function refreshUI(claimed){
+  document.getElementById('sc0').textContent=scores[0];
+  document.getElementById('sc1').textContent=scores[1];
+  document.getElementById('card0').classList.toggle('alive',curPlayer===0&&!gameOver);
+  document.getElementById('card1').classList.toggle('alive',curPlayer===1&&!gameOver);
+  if(!gameOver) updateCharAnims();
+  const s=document.getElementById('status');
+  if(gameOver){
+    s.className='win';
+    if(scores[0]>scores[1])      s.textContent='PLAYER 1 WINS!';
+    else if(scores[1]>scores[0]) s.textContent=vsComputer?'CPU WINS!':'PLAYER 2 WINS!';
+    else                         s.textContent="IT'S A TIE!";
+  }else{
+    s.className='';
+    const who=vsComputer&&curPlayer===1?'CPU':`Player ${curPlayer+1}`;
+    s.textContent=claimed>0?`${who} claimed ${claimed} triangle${claimed>1?'s':''}!  Go again →`:`${who}'s turn`;
   }
 }
-
-function drawTri(pts, fill, stroke) {
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x, pts[0].y);
-  ctx.lineTo(pts[1].x, pts[1].y);
-  ctx.lineTo(pts[2].x, pts[2].y);
-  ctx.closePath();
-  ctx.fillStyle   = fill;
-  ctx.fill();
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth   = 0.5;
-  ctx.globalAlpha = 0.35;
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-}
+function cssCoords(cx2,cy2){const r=canvas.getBoundingClientRect(),sw=parseFloat(canvas.style.width)||r.width,sh=parseFloat(canvas.style.height)||r.height;return{x:(cx2-r.left)*(sw/r.width),y:(cy2-r.top)*(sh/r.height)};}
+function playerCanAct(){return !gameOver&&!thinking&&!(vsComputer&&curPlayer===1);}
 
 // ═══════════════════════════════════════════════════
-//  UI helpers
+//  Input events
 // ═══════════════════════════════════════════════════
-function refreshUI(claimed) {
-  document.getElementById('sc0').textContent = scores[0];
-  document.getElementById('sc1').textContent = scores[1];
-
-  document.getElementById('card0').classList.toggle('alive', curPlayer===0 && !gameOver);
-  document.getElementById('card1').classList.toggle('alive', curPlayer===1 && !gameOver);
-
-  const statusEl = document.getElementById('status');
-  if (gameOver) {
-    statusEl.className = 'win';
-    if (scores[0] > scores[1])      statusEl.textContent = '🎉  PLAYER 1 WINS!';
-    else if (scores[1] > scores[0]) statusEl.textContent = vsComputer ? '🤖  CPU WINS!' : '🎉  PLAYER 2 WINS!';
-    else                            statusEl.textContent = '🤝  IT\'S A TIE!';
-  } else {
-    statusEl.className = '';
-    const who = vsComputer && curPlayer===1 ? 'CPU' : `Player ${curPlayer+1}`;
-    if (claimed > 0) {
-      statusEl.textContent = `${who} claimed ${claimed} triangle${claimed>1?'s':''}!  Go again →`;
-    } else {
-      statusEl.textContent = `${who}'s turn`;
-    }
-  }
-}
-
-// ═══════════════════════════════════════════════════
-//  Coordinate helper for events
-// ═══════════════════════════════════════════════════
-function cssCoords(clientX, clientY) {
-  const r = canvas.getBoundingClientRect();
-  const sw = parseFloat(canvas.style.width)  || r.width;
-  const sh = parseFloat(canvas.style.height) || r.height;
-  return {
-    x: (clientX - r.left) * (sw / r.width),
-    y: (clientY - r.top)  * (sh / r.height)
-  };
-}
-
-// ═══════════════════════════════════════════════════
-//  Events
-// ═══════════════════════════════════════════════════
-function playerCanAct() {
-  return !gameOver && !thinking && !(vsComputer && curPlayer===1);
-}
-
-canvas.addEventListener('mousemove', e => {
-  if (!playerCanAct()) { if (hover) { hover=null; draw(); } return; }
-  const {x,y} = cssCoords(e.clientX, e.clientY);
-  const ne = nearestEdge(x, y);
-  if (!eqE(ne, hover)) { hover = ne; draw(); }
+canvas.addEventListener('mousemove',e=>{
+  if(!playerCanAct()){if(hover){hover=null;draw();}return;}
+  const{x,y}=cssCoords(e.clientX,e.clientY),ne=nearestEdge(x,y);
+  if(!eqE(ne,hover)){hover=ne;draw();}
 });
-
-canvas.addEventListener('mouseleave', () => { hover = null; draw(); });
-
-canvas.addEventListener('click', e => {
-  if (!playerCanAct()) return;
-  const {x,y} = cssCoords(e.clientX, e.clientY);
-  const ne = nearestEdge(x, y);
-  if (!ne) return;
-  hover = null;
-  makeMove(ne);
+canvas.addEventListener('mouseleave',()=>{hover=null;draw();});
+canvas.addEventListener('click',e=>{
+  if(!playerCanAct()) return;
+  const{x,y}=cssCoords(e.clientX,e.clientY),ne=nearestEdge(x,y);
+  if(!ne) return; hover=null; makeMove(ne);
 });
+canvas.addEventListener('touchend',e=>{
+  if(!playerCanAct()) return; e.preventDefault();
+  const t=e.changedTouches[0],{x,y}=cssCoords(t.clientX,t.clientY),ne=nearestEdge(x,y);
+  if(!ne) return; hover=null; makeMove(ne);
+},{passive:false});
 
-canvas.addEventListener('touchend', e => {
-  if (!playerCanAct()) return;
-  e.preventDefault();
-  const t = e.changedTouches[0];
-  const {x,y} = cssCoords(t.clientX, t.clientY);
-  const ne = nearestEdge(x, y);
-  if (!ne) return;
-  hover = null;
-  makeMove(ne);
-}, {passive: false});
-
-// Mode buttons
-document.getElementById('btnPvP').addEventListener('click', () => {
-  vsComputer = false;
+document.getElementById('btnPvP').addEventListener('click',()=>{
+  vsComputer=false;
   document.getElementById('btnPvP').classList.add('on');
   document.getElementById('btnPvC').classList.remove('on');
-  document.getElementById('p2name').textContent = 'Player 2';
+  document.getElementById('p2name').textContent='Player 2';
   initGame();
 });
-document.getElementById('btnPvC').addEventListener('click', () => {
-  vsComputer = true;
+document.getElementById('btnPvC').addEventListener('click',()=>{
+  vsComputer=true;
   document.getElementById('btnPvC').classList.add('on');
   document.getElementById('btnPvP').classList.remove('on');
-  document.getElementById('p2name').textContent = 'CPU';
+  document.getElementById('p2name').textContent='CPU';
   initGame();
 });
-document.getElementById('btnNew').addEventListener('click', initGame);
-document.getElementById('szSel').addEventListener('change', initGame);
+document.getElementById('btnNew').addEventListener('click',initGame);
+document.getElementById('szSel').addEventListener('change',initGame);
+document.getElementById('btnSnd').addEventListener('click',()=>{
+  soundOn=!soundOn;
+  document.getElementById('btnSnd').classList.toggle('muted',!soundOn);
+  document.getElementById('sndOn').style.display=soundOn?'':'none';
+  document.getElementById('sndOff').style.display=soundOn?'none':'';
+});
 
 // ─── Boot ──────────────────────────────────────────
-vsComputer = false;
+vsComputer=false;
 initGame();
+startCharLoop();
 </script>
 </body>
 </html>
